@@ -20,5 +20,24 @@ pipeline {
                 '''
             }
         }
+
+        stage('Test') {
+            // We are using npm test, so we need a container with an npm image
+            agent {
+                docker { 
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                // Test if the file exists, and run the project-specific tests
+                sh '''
+                    test -f build/index.html
+                    npm test
+                '''
+
+            }
+            
+        }
     }
 }
