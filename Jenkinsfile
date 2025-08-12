@@ -42,7 +42,7 @@ pipeline {
             // We are using npm test, so we need a container with an npm image
             agent {
                 docker { 
-                    image 'mcr.microsoft.com/playwright:v1.39.0-noble'
+                    image 'mcr.microsoft.com/playwright:v1.49.1-noble'
                     reuseNode true
                 }
             }
