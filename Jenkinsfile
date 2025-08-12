@@ -30,12 +30,30 @@ pipeline {
                 }
             }
             steps {
-                // Test if the file exists, and run the project-specific tests
                 sh '''
                     test -f build/index.html
                     npm test
                 '''
+            }
+            
+        }
 
+        stage('End-To-End Tests') {
+            // We are using npm test, so we need a container with an npm image
+            agent {
+                docker { 
+                    image 'mcr.microsoft.com/playwright:v1.54.0-noble' // copied from https://playwright.dev/docs/docker
+                    reuseNode true
+                }
+            }
+            steps {
+                // playwright is an external tool to run E2E tests
+                // We are installing serve locally (to the project) and running it
+                sh '''
+                    npm install serve
+                    node_modules/.bin/serve -s build
+                    npx playwright test
+                '''
             }
             
         }
