@@ -51,7 +51,10 @@ pipeline {
                 // We are installing serve locally (to the project) and running it
                 sh '''
                     npm install serve
-                    node_modules/.bin/serve -s build
+                    # The & means run the server in the background and do not block the execution of the rest of the commands
+                    node_modules/.bin/serve -s build &
+                    # Wait for 10 seconds for the server to start
+                    sleep 10
                     npx playwright test
                 '''
             }
