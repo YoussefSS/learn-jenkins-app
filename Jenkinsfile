@@ -49,11 +49,11 @@ pipeline {
             steps {
                 // playwright is an external tool to run E2E tests
                 // We are installing serve locally (to the project) and running it
+                // The & after serve means run the server in the background and do not block the execution of the rest of the commands
+                // We also wait for 10 seconds for the server to start
                 sh '''
                     npm install serve
-                    # The & means run the server in the background and do not block the execution of the rest of the commands
                     node_modules/.bin/serve -s build &
-                    # Wait for 10 seconds for the server to start
                     sleep 10
                     npx playwright test
                 '''
