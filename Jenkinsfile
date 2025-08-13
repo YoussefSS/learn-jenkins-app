@@ -133,28 +133,6 @@ pipeline {
         }
 
         stage('Deploy prod') {
-            // We are using npm commands, so we need a container with an npm image
-            agent {
-                docker { 
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                // Adding netlify locally, not globally to prevent access issues. This can be skipped by adding netlify to the package.json files
-                // In deploy, we are providing the build folder, and saying deploy to production.
-                sh '''
-                    echo "Small change"
-                    npm install netlify-cli@20.1.1
-                    node_modules/.bin/netlify --version
-                    echo "Deploying to production, Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
-                '''
-            }
-        }
-
-        stage('Prod End-To-End Tests') {
             // We are using npm test, so we need a container with an npm image
             agent {
                 docker { 
@@ -167,6 +145,13 @@ pipeline {
             }
             steps {
                 sh '''
+                    node --version
+                    echo "Small change"
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to production, Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --prod
                     npx playwright test --reporter=html
                 '''
             }
