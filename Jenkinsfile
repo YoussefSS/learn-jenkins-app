@@ -4,6 +4,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = 'c93acf51-8803-419f-920a-f633fb067e19' // Netlify checks for this environment variable, so must be spelled correctly
         NETLIFY_AUTH_TOKEN = credentials('netlify-token') // Netlify also checks this
+        REACT_APP_VERSION = '1.0.$BUILD_ID"'
     }
 
     stages {
@@ -106,14 +107,6 @@ pipeline {
                 }
             }
         }   
-
-        stage('Approval') {
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    input message: 'Do you wish to deploy to production?', ok: 'Yes, I am sure!'
-                }
-            }
-        }
 
         stage('Deploy prod') {
             // We are using npm test, so we need a container with an npm image
