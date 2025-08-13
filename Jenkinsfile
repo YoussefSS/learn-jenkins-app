@@ -71,35 +71,56 @@ pipeline {
                     }
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report Local', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
-                }
-
-                stage('Deploy') {
-                    // We are using npm commands, so we need a container with an npm image
-                    agent {
-                        docker { 
-                            image 'node:18-alpine'
-                            reuseNode true
-                        }
-                    }
-                    steps {
-                        // Adding netlify locally, not globally to prevent access issues. This can be skipped by adding netlify to the package.json files
-                        // In deploy, we are providing the build folder, and saying deploy to production.
-                        sh '''
-                            echo "Small change"
-                            npm install netlify-cli@20.1.1
-                            node_modules/.bin/netlify --version
-                            echo "Deploying to Site ID: $NETLIFY_SITE_ID"
-                            node_modules/.bin/netlify status
-                            node_modules/.bin/netlify deploy --dir=build --prod
-                        '''
-                    }
-                }
+                }              
             }
         }
 
-        
+        stage('Deploy') {
+            // We are using npm commands, so we need a container with an npm image
+            agent {
+                docker { 
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                // Adding netlify locally, not globally to prevent access issues. This can be skipped by adding netlify to the package.json files
+                // In deploy, we are providing the build folder, and saying deploy to production.
+                sh '''
+                    echo "Small change"
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --prod
+                '''
+            }
+        }
+
+        stage('Prod End-To-End Tests') {
+            // We are using npm test, so we need a container with an npm image
+            agent {
+                docker { 
+                    image 'mcr.microsoft.com/playwright:v1.49.1-noble'
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = 'https://bespoke-swan-99a41f.netlify.app'
+            }
+            steps {
+                sh '''
+                    npx playwright test --reporter=html
+                '''
+            }
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report Production', reportTitles: '', useWrapperFileDirectly: true])
+                }
+            }
+        }        
     }
 }
