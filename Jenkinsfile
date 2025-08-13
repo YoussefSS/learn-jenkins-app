@@ -78,7 +78,27 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy staging') {
+            agent {
+                docker { 
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                // We use similar commands to production, without the --prod flag, this means netlify will deploy this to a draft url
+                sh '''
+                    echo "Small change"
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to staging, Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build
+                '''
+            }
+        }
+
+        stage('Deploy prod') {
             // We are using npm commands, so we need a container with an npm image
             agent {
                 docker { 
@@ -93,7 +113,7 @@ pipeline {
                     echo "Small change"
                     npm install netlify-cli@20.1.1
                     node_modules/.bin/netlify --version
-                    echo "Deploying to Site ID: $NETLIFY_SITE_ID"
+                    echo "Deploying to production, Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
