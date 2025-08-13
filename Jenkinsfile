@@ -79,29 +79,6 @@ pipeline {
         }
 
         stage('Deploy staging') {
-            agent {
-                docker { 
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                // We use similar commands to production, without the --prod flag, this means netlify will deploy this to a draft temporary url
-                sh '''
-                    npm install netlify-cli@20.1.1 node-jq
-                    node_modules/.bin/netlify --version
-                    echo "Deploying to staging, Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
-                '''
-                script {
-                    env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
-                }
-            }
-        }
-
-
-        stage('Staging End-To-End Tests') {
             // We are using npm test, so we need a container with an npm image
             agent {
                 docker { 
@@ -110,10 +87,16 @@ pipeline {
                 }
             }
             environment {
-                CI_ENVIRONMENT_URL = "${env.STAGING_URl}"
+                CI_ENVIRONMENT_URL = "STAGING_URL_TO_BE_SET"
             }
             steps {
                 sh '''
+                    npm install netlify-cli@20.1.1 node-jq
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to staging, Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    CI_ENVIRONMENT_URL=${node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json}
                     npx playwright test --reporter=html
                 '''
             }
