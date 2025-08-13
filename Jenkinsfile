@@ -86,7 +86,7 @@ pipeline {
                 }
             }
             steps {
-                // We use similar commands to production, without the --prod flag, this means netlify will deploy this to a draft url
+                // We use similar commands to production, without the --prod flag, this means netlify will deploy this to a draft temporary url
                 sh '''
                     echo "Small change"
                     npm install netlify-cli@20.1.1
@@ -95,6 +95,14 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build
                 '''
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    input message: 'Do you wish to deploy to production?', ok: 'Yes, I am sure!'
+                }
             }
         }
 
