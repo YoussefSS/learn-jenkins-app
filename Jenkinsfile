@@ -88,6 +88,7 @@ pipeline {
                         // Adding netlify locally, not globally to prevent access issues. This can be skipped by adding netlify to the package.json files
                         // In deploy, we are providing the build folder, and saying deploy to production.
                         sh '''
+                            echo "Small change"
                             npm install netlify-cli@20.1.1
                             node_modules/.bin/netlify --version
                             echo "Deploying to Site ID: $NETLIFY_SITE_ID"
