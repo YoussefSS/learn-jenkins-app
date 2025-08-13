@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        NETLIFY_SITE_ID = 'c93acf51-8803-419f-920a-f633fb067e19' // Netlify checks for this environment variable, so must be spelled correctly
+    }
+
     stages {
         stage('Build') {
             agent {
@@ -80,10 +84,11 @@ pipeline {
                         }
                     }
                     steps {
-                        // Adding netlify locally, not globally to prevent access issues
+                        // Adding netlify locally, not globally to prevent access issues. This can be skipped by adding netlify to the package.json files
                         sh '''
-                            npm install netlify-cli
+                            npm install netlify-cli@20.1.1
                             node_modules/.bin/netlify --version
+                            echo "Deploying to Site ID: $NETLIFY_SITE_ID"
                         '''
                     }
                 }
