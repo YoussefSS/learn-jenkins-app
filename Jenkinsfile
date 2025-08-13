@@ -70,6 +70,23 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Deploy') {
+                    // We are using npm commands, so we need a container with an npm image
+                    agent {
+                        docker { 
+                            image 'node:18-alpine'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        // Adding netlify locally, not globally to prevent access issues
+                        sh '''
+                            npm install netlify-cli
+                            node_modules/.bin/netlify --version
+                        '''
+                    }
+                }
             }
         }
 
