@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         NETLIFY_SITE_ID = 'c93acf51-8803-419f-920a-f633fb067e19' // Netlify checks for this environment variable, so must be spelled correctly
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token') // Netlify also checks this
     }
 
     stages {
@@ -89,6 +90,7 @@ pipeline {
                             npm install netlify-cli@20.1.1
                             node_modules/.bin/netlify --version
                             echo "Deploying to Site ID: $NETLIFY_SITE_ID"
+                            node_modules/.bin/netlify status
                         '''
                     }
                 }
