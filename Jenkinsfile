@@ -4,7 +4,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = 'c93acf51-8803-419f-920a-f633fb067e19' // Netlify checks for this environment variable, so must be spelled correctly
         NETLIFY_AUTH_TOKEN = credentials('netlify-token') // Netlify also checks this
-        REACT_APP_VERSION = '1.0.$BUILD_ID"'
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
     stages {
