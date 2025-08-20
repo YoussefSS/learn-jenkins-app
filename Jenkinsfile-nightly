@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build Docker Image') {
+            steps {
+                // Building the docker image from the Dockerfile, and giving it a tag called my-playwright
+                sh 'docker build -t my-playwright .' // The . means the current directory
+            }
+        }
+    }
+}
