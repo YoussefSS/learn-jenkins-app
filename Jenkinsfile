@@ -62,18 +62,16 @@ pipeline {
                     // We are using npm test, so we need a container with an npm image
                     agent {
                         docker { 
-                            image 'mcr.microsoft.com/playwright:v1.49.1-noble'
+                            image 'my-playwright'
                             reuseNode true
                         }
                     }
                     steps {
                         // playwright is an external tool to run E2E tests
-                        // We are installing serve locally (to the project) and running it
                         // The & after serve means run the server in the background and do not block the execution of the rest of the commands
                         // We also wait for 10 seconds for the server to start
                         sh '''
-                            npm install serve
-                            node_modules/.bin/serve -s build &
+                            serve -s build &
                             sleep 10
                             npx playwright test --reporter=html
                         '''
