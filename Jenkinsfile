@@ -8,6 +8,14 @@ pipeline {
     }
 
     stages {
+
+        stage('Docker') {
+            steps {
+                // Building the docker image from the Dockerfile
+                sh 'docker build -t my-playwright .' // The . means the current directory
+            }
+        }
+
         stage('Build') {
             agent {
                 docker { // we need docker to have a config with npm
