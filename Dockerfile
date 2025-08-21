@@ -7,5 +7,7 @@ FROM mcr.microsoft.com/playwright:v1.49.1-noble
 RUN npm install -g netlify-cli@20.1.1 serve
 
 # The image we are using above (noble) is a version of ubuntu, so we can also use linux commands
-RUN apt update
-RUN apt install jq -y
+# RUN apt update
+# RUN apt install jq -y
+# Running them on the same line as Docker will reuse the result of apt update and we don't want that if we install something different later
+RUN apt update && apt install jq -y
